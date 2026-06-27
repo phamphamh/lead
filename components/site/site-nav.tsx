@@ -42,12 +42,13 @@ export function SiteNav() {
         <div className="flex items-center gap-2.5">
           <Link
             href="/audit"
+            data-cta="free-audit"
             className="hidden h-[34px] items-center px-1.5 text-[13.5px] text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
           >
             Free audit
           </Link>
           <Button asChild size="lg">
-            <Link href="/onboarding">
+            <Link href="/onboarding" data-cta="get-started">
               Get started
               <ArrowRight data-icon="inline-end" />
             </Link>

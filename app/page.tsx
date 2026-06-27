@@ -101,7 +101,7 @@ export default function Home() {
             </p>
             <div className="mb-[22px] flex flex-wrap gap-3">
               <Button asChild size="lg" className="h-[46px] px-[22px] text-[15px]">
-                <Link href="/onboarding">
+                <Link href="/onboarding" data-cta="get-started">
                   Get started
                   <ArrowRight data-icon="inline-end" />
                 </Link>
@@ -112,7 +112,7 @@ export default function Home() {
                 size="lg"
                 className="h-[46px] px-[18px] text-[15px] hover:border-primary"
               >
-                <Link href="/audit">Audit my landing — free</Link>
+                <Link href="/audit" data-cta="free-audit">Audit my landing — free</Link>
               </Button>
             </div>
             <div className="flex flex-wrap items-center gap-4 text-[12.5px] text-muted-foreground">
@@ -760,7 +760,7 @@ export default function Home() {
               size="lg"
               className="h-12 px-[22px] text-[15.5px]"
             >
-              <Link href="/audit">
+              <Link href="/audit" data-cta="free-audit">
                 Audit my landing — free
                 <ArrowRight data-icon="inline-end" />
               </Link>
@@ -804,13 +804,14 @@ export default function Home() {
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Button asChild size="lg" className="h-12 px-6 text-[15.5px]">
-                <Link href="/onboarding">
+                <Link href="/onboarding" data-cta="get-started">
                   Get started
                   <ArrowRight data-icon="inline-end" />
                 </Link>
               </Button>
               <Link
                 href="/audit"
+                data-cta="free-audit"
                 className="inline-flex h-12 items-center rounded-[9px] border border-background/30 px-5 text-[15px] font-medium text-background transition-colors hover:bg-background/10"
               >
                 Run the free audit

@@ -310,7 +310,7 @@ export default function AuditPage() {
               </p>
               <div className="flex flex-wrap justify-center gap-3">
                 <Button asChild size="lg" className="h-12 px-6 text-[15.5px]">
-                  <a href="/onboarding">
+                  <a href="/onboarding" data-cta="get-started">
                     Get started
                     <ArrowRight data-icon="inline-end" />
                   </a>

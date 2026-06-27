@@ -32,9 +32,32 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
       <Suspense fallback={null}>
         <PageviewTracker />
       </Suspense>
+      <CtaTracker />
       {children}
     </PHProvider>
   );
+}
+
+// Delegated click tracker: any element (or descendant) carrying a `data-cta`
+// attribute fires a named `cta_clicked` event with which CTA, where it points,
+// and its visible label. Lets us track every conversion button without turning
+// each server-rendered CTA into a client component.
+function CtaTracker() {
+  useEffect(() => {
+    function onClick(e: MouseEvent) {
+      const start = e.target as HTMLElement | null;
+      const el = start?.closest<HTMLElement>("[data-cta]");
+      if (!el) return;
+      posthog.capture("cta_clicked", {
+        cta: el.dataset.cta,
+        href: el.getAttribute("href"),
+        text: el.textContent?.trim().slice(0, 80),
+      });
+    }
+    document.addEventListener("click", onClick, true);
+    return () => document.removeEventListener("click", onClick, true);
+  }, []);
+  return null;
 }
 
 // Fires a $pageview on every App Router navigation (path or query change).

@@ -109,13 +109,13 @@ export default async function AuditSharePage({ params }: PageProps) {
           {/* CTAs */}
           <div className="mt-7 flex flex-wrap items-center gap-3">
             <Button asChild size="lg" className="h-12 px-6 text-[15px]">
-              <Link href="/onboarding">
+              <Link href="/onboarding" data-cta="get-started">
                 Have the agent fix this
                 <ArrowRight data-icon="inline-end" />
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="h-12 px-5 text-[15px]">
-              <Link href="/audit">
+              <Link href="/audit" data-cta="free-audit">
                 <RefreshCw data-icon="inline-start" />
                 Run your own free audit
               </Link>
