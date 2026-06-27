@@ -10,9 +10,12 @@ interface LandingProps {
   configId: string | null;
   utmSource?: string;
   utmTerm?: string;
+  // When true (dashboard thumbnails), do NOT fire analytics events — otherwise
+  // every grid preview would inflate the "view" count the agent reasons on.
+  preview?: boolean;
 }
 
-export default function Landing({ config, configId, utmSource, utmTerm }: LandingProps) {
+export default function Landing({ config, configId, utmSource, utmTerm, preview }: LandingProps) {
   const formRef = useRef<HTMLDivElement | null>(null);
   const viewFired = useRef(false);
 
@@ -29,6 +32,7 @@ export default function Landing({ config, configId, utmSource, utmTerm }: Landin
   }, []);
 
   async function postEvent(type: EventType): Promise<void> {
+    if (preview) return; // dashboard thumbnail — never pollute metrics.
     if (!configId) return; // no real config (DB unreachable) — nothing to attribute to.
     try {
       await fetch("/api/events", {
