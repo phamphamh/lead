@@ -223,4 +223,4 @@ Next steps (not yet done):
   Multi-file commit + PR helpers in `lib/github.ts`. `POST /api/setup-sdk` streams
   `SetupEvent` NDJSON; trigger is the "Set it up for me → Open a PR" panel in the
   Settings install card. Note: the injected snippet URL is `BETTER_AUTH_URL` (set a
-  public Lead URL for prod) and the PR is review-gated.
+  public Vela URL for prod) and the PR is review-gated.

@@ -99,7 +99,7 @@ const SUBMIT_FINDINGS_TOOL: Anthropic.Tool = {
   },
 };
 
-const DISCOVERY_SYSTEM = `You are the codebase-analysis agent for Lead, a conversion-rate-optimization platform that ships A/B tests into customers' own repos.
+const DISCOVERY_SYSTEM = `You are the codebase-analysis agent for Vela, a conversion-rate-optimization platform that ships A/B tests into customers' own repos.
 
 Your job: locate the three conversion surfaces in a customer's repository.
 - landing — the public marketing/home page a cold visitor first sees (hero, value prop, primary CTA).

@@ -12,7 +12,7 @@ export default function OnboardingLayout({
       <header className="flex h-14 items-center justify-between px-5 lg:px-8">
         <Link href="/" className="flex items-center gap-2 font-semibold">
           <span className="size-2.5 rounded-full bg-primary" />
-          lead
+          Vela
           <span className="rounded bg-secondary px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wide text-muted-foreground">
             beta
           </span>

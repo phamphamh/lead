@@ -206,7 +206,7 @@ export default function SettingsPage() {
               label="Branch prefix"
               hint="Prefix for agent-created branches."
             >
-              <Input defaultValue="lead/" className="font-mono" />
+              <Input defaultValue="vela/" className="font-mono" />
             </FieldRow>
           </SectionShell>
 

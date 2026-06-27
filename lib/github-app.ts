@@ -61,7 +61,7 @@ export async function getInstallationToken(userToken: string): Promise<string> {
     installations?.find((i) => i.app_slug === env.GITHUB_APP_SLUG) ??
     installations?.[0];
   if (!inst) {
-    throw new Error("The lead GitHub App is not installed on this account.");
+    throw new Error("The Vela GitHub App is not installed on this account.");
   }
 
   const jwt = appJwt(inst.app_id);

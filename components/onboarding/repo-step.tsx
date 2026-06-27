@@ -183,7 +183,7 @@ export function RepoStep({
                 </span>
                 <div className="space-y-1">
                   <p className="text-sm font-medium">
-                    Install the lead GitHub App
+                    Install the Vela GitHub App
                   </p>
                   <p className="text-xs text-muted-foreground">
                     Pick the repositories you want to optimize. We&apos;ll detect

@@ -56,7 +56,7 @@ export function ConnectStep() {
           Connect your repository
         </h1>
         <p className="text-sm text-muted-foreground">
-          lead reads your codebase to find and ship higher-converting landing
+          Vela reads your codebase to find and ship higher-converting landing
           pages, onboarding, and paywalls — automatically.
         </p>
       </div>
