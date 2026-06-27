@@ -30,7 +30,16 @@ function b64url(input: Buffer | string): string {
 function readPrivateKey(): string {
   const inline = env.GITHUB_APP_PRIVATE_KEY;
   if (inline && inline.trim()) {
-    return inline.includes("\\n") ? inline.replace(/\\n/g, "\n") : inline;
+    const raw = inline.trim();
+    // base64-encoded PEM (no header in the value) — the only encoding that
+    // survives Coolify/nixpacks .env writing untouched (no newlines, no
+    // backslashes to double-escape). Decode it back to a real PEM.
+    if (!raw.includes("BEGIN")) {
+      return Buffer.from(raw, "base64").toString("utf8");
+    }
+    // Otherwise it's already a PEM: collapse any escaped newlines (single or
+    // double-escaped, as some env layers mangle `\n`) back to real ones.
+    return raw.replace(/\\+n/g, "\n");
   }
   return readFileSync(env.GITHUB_APP_PRIVATE_KEY_PATH, "utf8");
 }
