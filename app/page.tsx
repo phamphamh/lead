@@ -21,9 +21,9 @@ import { SiteFooter } from "@/components/site/site-footer"
 import { SiteNav } from "@/components/site/site-nav"
 
 export const metadata: Metadata = {
-  title: "lead — Your landing optimizes itself. In real code.",
+  title: "Vela — Your landing optimizes itself. In real code.",
   description:
-    "lead is the autonomous CRO agent for B2B SaaS. It connects your GitHub repo, audits your code, drafts variants as review-gated PRs, A/B tests them on real traffic, and iterates — you review and merge.",
+    "Vela is the autonomous CRO agent for B2B SaaS. It connects your GitHub repo, audits your code, drafts variants as review-gated PRs, A/B tests them on real traffic, and iterates — you review and merge.",
 }
 
 /* --- small building blocks -------------------------------------------- */
@@ -95,7 +95,7 @@ export default function Home() {
               In real code.
             </h1>
             <p className="mb-[30px] max-w-[520px] text-[clamp(16px,1.6vw,18.5px)] text-pretty text-muted-foreground">
-              <strong className="font-medium text-foreground">lead</strong>{" "}
+              <strong className="font-medium text-foreground">Vela</strong>{" "}
               connects your GitHub repo, audits your code, drafts variants (PR +
               feature flag), A/B tests them on real traffic and iterates —
               autonomously. You review and merge. Or you don&apos;t.
@@ -137,7 +137,7 @@ export default function Home() {
                 <span className="size-[9px] rounded-full bg-foreground/20" />
                 <span className="size-[9px] rounded-full bg-foreground/20" />
                 <span className="ml-1.5 font-mono text-[11.5px] text-muted-foreground">
-                  lead · control room
+                  Vela · control room
                 </span>
                 <span className="ml-auto inline-flex items-center gap-1.5 font-mono text-[11px] text-success">
                   <span className="size-1.5 animate-pulse rounded-full bg-success motion-reduce:animate-none" />
@@ -621,7 +621,7 @@ export default function Home() {
                   Criterion
                 </th>
                 <th className="border-l border-border bg-primary/[0.07] px-4 py-3.5 text-center font-semibold text-primary">
-                  lead
+                  Vela
                 </th>
                 <th className="border-l border-border px-4 py-3.5 text-center font-medium text-muted-foreground">
                   CRO agency

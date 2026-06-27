@@ -15,7 +15,7 @@ import { lookup } from "node:dns/promises";
 const TIMEOUT_MS = 8_000;
 const MAX_BYTES = 1_500_000; // ~1.5MB
 const MAX_REDIRECTS = 5;
-const USER_AGENT = "lead-audit-bot/1.0 (+https://lead.dev)";
+const USER_AGENT = "vela-audit-bot/1.0 (+https://vela.dev)";
 
 export type FetchResult =
   | { ok: true; html: string; finalUrl: string }

@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { BOOKING_URL } from "@/lib/config";
 
 export const metadata: Metadata = {
-  title: "Free CRO audit — find out why your landing isn't converting | lead",
+  title: "Free CRO audit — find out why your landing isn't converting | Vela",
   description:
     "Free, no-login CRO audit by Claude. Paste your landing URL and get a scored report of what's blocking conversion in ~30 seconds. Then the agent drafts the fixes in real code.",
   openGraph: {

@@ -1,11 +1,11 @@
-# lead — Product & Dashboard Spec
+# Vela — Product & Dashboard Spec
 
 > Source of truth for what the product does and how the dashboard is organized.
 > Implementation guidance lives in `CLAUDE.md`.
 
 ## Vision
 
-**lead** helps companies that own SaaS products ship **high-converting landing
+**Vela** helps companies that own SaaS products ship **high-converting landing
 pages, onboarding flows, and paywalls** automatically. The user connects GitHub;
 an agent orchestrator analyzes the codebase, drafts changes, ships them as A/B
 test variants, measures conversion, and iterates — a continuous

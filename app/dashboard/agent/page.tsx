@@ -172,7 +172,7 @@ const runs: Run[] = [
     status: "success",
     duration: "23s",
     when: "2h ago",
-    summary: "Branch lead/paywall-annual-emphasis pushed; flag wired via SDK.",
+    summary: "Branch vela/paywall-annual-emphasis pushed; flag wired via SDK.",
   },
   {
     id: "run_8e44",

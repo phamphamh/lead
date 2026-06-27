@@ -8,7 +8,7 @@ export function Sidebar() {
       <div className="flex h-14 items-center gap-2 border-b border-border px-5">
         <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
           <span className="size-2.5 rounded-full bg-primary" />
-          lead
+          Vela
         </Link>
         <span className="rounded bg-secondary px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wide text-muted-foreground">
           beta

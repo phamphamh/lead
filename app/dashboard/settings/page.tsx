@@ -38,7 +38,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const SDK_KEY = "lead_sk_live_8c2f4a91d7e0b3";
+const SDK_KEY = "vela_sk_live_8c2f4a91d7e0b3";
 
 const sections = [
   { id: "repo", label: "Repository", icon: Github },
@@ -109,7 +109,7 @@ function SdkKeyField() {
   return (
     <div className="flex items-center gap-2">
       <code className="flex h-9 min-w-0 flex-1 items-center truncate rounded-md border border-border bg-muted/40 px-3 font-mono text-xs">
-        {revealed ? SDK_KEY : "lead_sk_live_••••••••••••"}
+        {revealed ? SDK_KEY : "vela_sk_live_••••••••••••"}
       </code>
       <Button
         size="icon"
@@ -244,7 +244,7 @@ export default function SettingsPage() {
               label="Branch prefix"
               hint="Prefix for agent-created branches."
             >
-              <Input defaultValue="lead/" className="font-mono" />
+              <Input defaultValue="vela/" className="font-mono" />
             </FieldRow>
           </SectionShell>
 
@@ -293,7 +293,7 @@ export default function SettingsPage() {
               <SdkKeyField />
               <p className="text-xs text-muted-foreground">
                 Used by{" "}
-                <span className="font-mono">@lead/sdk</span> to identify this
+                <span className="font-mono">@vela/sdk</span> to identify this
                 project. Keep it server-side where possible.
               </p>
             </div>
@@ -301,15 +301,15 @@ export default function SettingsPage() {
             <div className="space-y-1.5">
               <Label className="text-sm">Install</Label>
               <code className="block overflow-x-auto rounded-md border border-border bg-muted/40 px-3 py-2.5 font-mono text-xs">
-                bun add @lead/sdk
+                bun add @vela/sdk
               </code>
               <code className="block overflow-x-auto rounded-md border border-border bg-muted/40 px-3 py-2.5 font-mono text-xs leading-relaxed">
                 <span className="text-muted-foreground">
                   {"// app/layout.tsx"}
                 </span>
-                {"\n"}import {"{ LeadProvider }"} from &quot;@lead/sdk&quot;;
-                {"\n\n"}&lt;LeadProvider projectKey=&quot;lead_sk_live_…&quot;&gt;
-                {"\n  "}&lt;App /&gt;{"\n"}&lt;/LeadProvider&gt;
+                {"\n"}import {"{ VelaProvider }"} from &quot;@vela/sdk&quot;;
+                {"\n\n"}&lt;VelaProvider projectKey=&quot;vela_sk_live_…&quot;&gt;
+                {"\n  "}&lt;App /&gt;{"\n"}&lt;/VelaProvider&gt;
               </code>
             </div>
             <Separator />

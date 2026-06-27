@@ -7,7 +7,7 @@
  * dead link in development.
  */
 export const BOOKING_URL =
-  process.env.NEXT_PUBLIC_BOOKING_URL ?? "https://cal.com/lead/demo";
+  process.env.NEXT_PUBLIC_BOOKING_URL ?? "https://cal.com/vela/demo";
 
 /** Claude model used by the audit. Overridable via AGENT_MODEL. */
 export const AGENT_MODEL = process.env.AGENT_MODEL ?? "claude-opus-4-8";

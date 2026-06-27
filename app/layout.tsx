@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "lead — conversion experiments on autopilot",
+  title: "Vela — conversion experiments on autopilot",
   description:
     "Connect GitHub, let agents analyze your codebase, ship A/B tested landing, onboarding, and paywall experiments, and learn from the data.",
 };

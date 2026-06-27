@@ -82,7 +82,7 @@ function MobileNav() {
       <SheetContent side="left" className="w-64 p-0">
         <SheetHeader className="h-14 flex-row items-center gap-2 border-b border-border px-5">
           <span className="size-2.5 rounded-full bg-primary" />
-          <SheetTitle className="font-semibold">lead</SheetTitle>
+          <SheetTitle className="font-semibold">Vela</SheetTitle>
         </SheetHeader>
         <DashboardNav onNavigate={() => setOpen(false)} />
       </SheetContent>

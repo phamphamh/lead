@@ -53,7 +53,7 @@ export function SiteFooter() {
             <span className="inline-flex size-[22px] items-center justify-center rounded-md bg-primary">
               <RefreshCw className="size-3 text-primary-foreground" strokeWidth={2.4} />
             </span>
-            <span className="text-[15px] font-semibold">lead</span>
+            <span className="text-[15px] font-semibold">Vela</span>
             <span className="rounded-[5px] border border-border px-1.5 py-px font-mono text-[10.5px] text-muted-foreground">
               auto-CRO
             </span>
@@ -87,7 +87,7 @@ export function SiteFooter() {
       {/* Sub-row */}
       <div className="border-t border-border">
         <div className="mx-auto flex max-w-[1160px] flex-wrap items-center justify-between gap-4 px-6 py-4 text-[12.5px] text-muted-foreground">
-          <span className="font-mono">© 2026 lead</span>
+          <span className="font-mono">© 2026 Vela</span>
           <span className="inline-flex items-center gap-1.5">
             <span className="size-1.5 rounded-full bg-success" />
             Audit powered by Claude

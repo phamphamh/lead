@@ -257,7 +257,7 @@ export function AuditTool() {
         <span className="size-[9px] rounded-full bg-muted-foreground/45" />
         <span className="size-[9px] rounded-full bg-muted-foreground/45" />
         <span className="ml-1.5 font-mono text-[11.5px] text-muted-foreground">
-          lead · free audit
+          Vela · free audit
         </span>
         <span className="ml-auto inline-flex items-center gap-1.5 font-mono text-[11px] text-muted-foreground">
           <span className="size-1.5 rounded-full bg-success" />

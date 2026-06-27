@@ -20,7 +20,7 @@ export function SiteNav() {
           <span className="inline-flex size-6 items-center justify-center rounded-md bg-primary shadow-sm">
             <RefreshCw className="size-3.5 text-primary-foreground" strokeWidth={2.4} />
           </span>
-          <span className="text-base font-semibold tracking-tight">lead</span>
+          <span className="text-base font-semibold tracking-tight">Vela</span>
           <span className="rounded-[5px] border border-border px-1.5 py-px font-mono text-[11px] tracking-wide text-muted-foreground">
             auto-CRO
           </span>

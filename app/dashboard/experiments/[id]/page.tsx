@@ -70,7 +70,7 @@ const experiment: ExperimentDetail = {
     "Leading the paywall with annual savings (vs. the monthly price) reduces price anchoring friction and lifts checkout starts.",
   running: "6d 4h",
   goal: "Checkout started",
-  pr: { number: 318, repo: "acme/web", branch: "lead/paywall-annual-emphasis", state: "Open" },
+  pr: { number: 318, repo: "acme/web", branch: "vela/paywall-annual-emphasis", state: "Open" },
   uplift: 12.4,
   confidence: 95,
   totalVisitors: 3201,

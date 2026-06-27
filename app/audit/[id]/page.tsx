@@ -42,8 +42,8 @@ export async function generateMetadata({
 
   if (!audit || !isAuditResult(audit.result)) {
     return {
-      title: "CRO audit — lead",
-      description: "A free, Claude-generated CRO audit by lead.",
+      title: "CRO audit — Vela",
+      description: "A free, Claude-generated CRO audit by Vela.",
     };
   }
 
