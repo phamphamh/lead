@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Growth Agent — V1
 
-## Getting Started
+Un agent CRO autonome : il ingère la data d'une landing, écrit une hypothèse en langage
+clair, génère une variante (config JSON), la déploie, mesure, recommence — et **refuse**
+les gains proximaux (clics) qui dégradent la valeur downstream (leads qualifiés).
 
-First, run the development server:
+## Stack
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind v4 · Prisma + Postgres ·
+Claude (Opus 4.8) via `@anthropic-ai/sdk`. Auto-hébergé (Hetzner + Coolify).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Lancer en local
+1. Renseigne `.env` :
+   - `DATABASE_URL` → un Postgres accessible (Coolify, Docker, ou local).
+   - `ANTHROPIC_API_KEY` → clé Claude (https://console.anthropic.com/settings/keys).
+   - `SAMPLE_GATE_N` → seuil d'events/variante avant que l'agent arrête de s'abstenir (défaut 30).
+2. Prépare la base :
+   ```bash
+   npx prisma migrate deploy     # ou: npx prisma migrate dev --name init
+   npm run db:seed               # crée la config baseline + le lock
+   ```
+3. Dev : `npm run dev` → http://localhost:3000
+   - `/` : la landing (rendue depuis la config active).
+   - `/agent` : le cockpit (dashboard + reasoning log + boutons Avancer / Veto / mode / inject [SIM]).
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Boucle de démo
+1. Sur `/agent`, mets le mode sur **[SIM]** et clique **"Injecter trafic [SIM]"** → génère
+   un pattern piège déterministe (clic ↑, qualifié ↓) sur la config active.
+2. Clique **"Avancer l'agent"** (ou active l'auto-advance) → l'agent lit les métriques,
+   raisonne, et selon les règles : `abstain` (pas assez de data) / `reject` (piège proximal)
+   / `ship` (vraie amélioration). Le verdict s'affiche dans le reasoning log.
+3. **Filet de sécurité scène** : `POST /api/fallback` rejoue un run pré-enregistré (story
+   baseline → ship trap → reject → ship downstream) si l'API Claude hoquette en live.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Routes API
+`/api/health` · `/api/events` · `/api/state` · `/api/decisions` · `/api/agent/step` ·
+`/api/agent/veto` · `/api/mode` · `/api/sim` · `/api/fallback`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Déploiement (Coolify @ Hetzner)
+Nouveau service Postgres 17 (1 clic) → `DATABASE_URL`. App Next depuis le repo (build
+nixpacks, port 3000, healthcheck `/api/health`), vars `DATABASE_URL` + `ANTHROPIC_API_KEY`.
+Build command : `prisma generate && next build`. Sous-domaine Porkbun → `159.69.41.115`,
+SSL auto. Voir `ascend/docs/chantiers/hosting-hetzner.md` pour la mécanique exacte.
