@@ -43,6 +43,38 @@ export async function POST() {
         configIds.push(created.id);
       }
 
+      // Seed deterministic events per config so the gallery cards actually show
+      // the story: baseline ok, TRAP = high clic / low leads, WINNER = high leads.
+      // configIds: [0]=baseline, [1]=trap, [2]=winner.
+      const SEED: Array<{ clickPct: number; formPct: number }> = [
+        { clickPct: 24, formPct: 9 }, // baseline
+        { clickPct: 56, formPct: 6 }, // trap: clics ↑, leads ↓
+        { clickPct: 32, formPct: 15 }, // winner: leads ↑
+      ];
+      const N = 50;
+      const evRows: {
+        configId: string;
+        sessionId: string;
+        type: string;
+        utmSource: string;
+        utmTerm: string;
+      }[] = [];
+      configIds.forEach((cid, idx) => {
+        const p = SEED[idx] ?? SEED[0];
+        for (let i = 0; i < N; i++) {
+          const bucket = i % 100;
+          const sid = `demo-${cid}-${i}`;
+          evRows.push({ configId: cid, sessionId: sid, type: "view", utmSource: "demo", utmTerm: "scripted" });
+          if (bucket < p.clickPct) {
+            evRows.push({ configId: cid, sessionId: sid, type: "click_cta", utmSource: "demo", utmTerm: "scripted" });
+            if (bucket < p.formPct) {
+              evRows.push({ configId: cid, sessionId: sid, type: "form_qualified", utmSource: "demo", utmTerm: "scripted" });
+            }
+          }
+        }
+      });
+      await tx.event.createMany({ data: evRows });
+
       // Insert decisions with increasing createdAt so /api/decisions (newest
       // first) replays the narrative with the winning ship on top.
       const base = Date.now() - FALLBACK_RUN.decisions.length * 1000;
