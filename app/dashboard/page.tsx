@@ -1,11 +1,10 @@
-import {
-  ArrowUpRight,
-  Check,
-  GitBranch,
-  Sparkles,
-  TrendingUp,
-} from "lucide-react";
+import Link from "next/link";
+import { ArrowUpRight, Check, Sparkles } from "lucide-react";
 
+import {
+  ActiveExperiments,
+  type ActiveExperiment,
+} from "@/components/dashboard/experiment-preview";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,47 +31,104 @@ const kpis = [
   { label: "Visitors in test", value: "12,480", sub: "last 14 days" },
 ];
 
-type ExStatus = "RUNNING" | "QUEUED" | "CONCLUSIVE" | "DRAFT";
-
-const active: {
-  surface: string;
-  title: string;
-  status: ExStatus;
-  uplift: string;
-  confidence: string;
-  visitors: string;
-}[] = [
+const active: ActiveExperiment[] = [
   {
+    id: "142",
     surface: "Paywall",
     title: "Pricing emphasis",
     status: "RUNNING",
     uplift: "+12.4%",
     confidence: "95%",
     visitors: "3,201",
+    hypothesis:
+      "Leading with annual savings (vs. the monthly price) reduces price anchoring and lifts checkout starts.",
+    preview: {
+      kind: "paywall",
+      url: "acme.com/pricing",
+      before: { plan: "Pro", price: "$29", period: "/mo", cta: "Start free trial" },
+      after: {
+        plan: "Pro",
+        price: "$279",
+        period: "/yr",
+        badge: "Save 20%",
+        subnote: "$23/mo billed annually",
+        cta: "Start free trial",
+      },
+    },
   },
   {
+    id: "139",
     surface: "Onboarding",
     title: "Shorter signup",
     status: "CONCLUSIVE",
     uplift: "+9.1%",
     confidence: "98%",
     visitors: "5,402",
+    hypothesis:
+      "Cutting the signup form to email-only and deferring the rest raises activation.",
+    preview: {
+      kind: "onboarding",
+      url: "acme.com/signup",
+      before: {
+        fields: ["Full name", "Work email", "Company", "Team size", "Role", "Password"],
+        cta: "Create account",
+      },
+      after: {
+        fields: ["Work email"],
+        cta: "Continue",
+        note: "We’ll email you a magic link — no password.",
+      },
+    },
   },
   {
+    id: "141",
     surface: "Landing",
     title: "Hero headline",
     status: "RUNNING",
     uplift: "+3.2%",
     confidence: "71%",
     visitors: "2,140",
+    hypothesis:
+      "An outcome-led headline beats the feature-led one on signups from cold traffic.",
+    preview: {
+      kind: "landing",
+      url: "acme.com",
+      before: {
+        headline: "Feature-rich analytics for modern teams",
+        sub: "Dashboards, reports, and integrations in one place.",
+        cta: "Learn more",
+      },
+      after: {
+        headline: "Know what your users do — in 5 minutes",
+        sub: "Live dashboards from day one. No setup, no SQL.",
+        cta: "Start free",
+        proof: "Trusted by 2,000+ teams",
+      },
+    },
   },
   {
+    id: "143",
     surface: "Paywall",
     title: "Annual default",
     status: "QUEUED",
     uplift: "—",
     confidence: "—",
     visitors: "—",
+    hypothesis:
+      "Pre-selecting the annual plan with a savings cue increases ARPU without raising churn.",
+    preview: {
+      kind: "paywall",
+      url: "acme.com/pricing",
+      before: { plan: "Billed monthly", price: "$29", period: "/mo", cta: "Choose plan" },
+      after: {
+        plan: "Billed annually",
+        price: "$23",
+        period: "/mo",
+        badge: "Best value · Save 20%",
+        subnote: "$279 billed yearly",
+        cta: "Choose plan",
+      },
+    },
   },
 ];
 
@@ -109,34 +165,6 @@ const activity = [
   { text: "Analyzed landing page", time: "3h" },
   { text: "Started experiment #142", time: "5h" },
 ];
-
-/* --- helpers ---------------------------------------------------------- */
-
-function StatusBadge({ status }: { status: ExStatus }) {
-  if (status === "RUNNING") {
-    return (
-      <Badge className="gap-1.5 bg-success text-success-foreground">
-        <span className="size-1.5 rounded-full bg-current" />
-        Running
-      </Badge>
-    );
-  }
-  if (status === "CONCLUSIVE") {
-    return (
-      <Badge
-        variant="outline"
-        className="gap-1.5 border-primary/40 text-primary"
-      >
-        <span className="size-1.5 rounded-full bg-current" />
-        Conclusive
-      </Badge>
-    );
-  }
-  if (status === "QUEUED") {
-    return <Badge variant="secondary">Queued</Badge>;
-  }
-  return <Badge variant="secondary">Draft</Badge>;
-}
 
 /* --- page ------------------------------------------------------------- */
 
@@ -251,69 +279,24 @@ export default function OverviewPage() {
         </Card>
       </div>
 
-      {/* active experiments table */}
+      {/* active experiments — click a row to preview the change */}
       <Card>
         <CardHeader>
           <CardTitle>Active experiments</CardTitle>
           <CardDescription>
-            Live and queued across all surfaces.
+            Live and queued across all surfaces — click to preview the change.
           </CardDescription>
           <CardAction>
-            <Button variant="ghost" size="sm" className="text-muted-foreground">
-              View all
-              <ArrowUpRight className="size-4" />
+            <Button variant="ghost" size="sm" className="text-muted-foreground" asChild>
+              <Link href="/dashboard/experiments">
+                View all
+                <ArrowUpRight className="size-4" />
+              </Link>
             </Button>
           </CardAction>
         </CardHeader>
         <CardContent>
-          {/* column headers */}
-          <div className="hidden grid-cols-12 gap-3 border-b border-border pb-2 font-mono text-[11px] uppercase tracking-wide text-muted-foreground sm:grid">
-            <div className="col-span-5">Experiment</div>
-            <div className="col-span-2">Status</div>
-            <div className="col-span-2 text-right">Uplift</div>
-            <div className="col-span-2 text-right">Confidence</div>
-            <div className="col-span-1 text-right">Visitors</div>
-          </div>
-          <div className="divide-y divide-border">
-            {active.map((e) => (
-              <div
-                key={`${e.surface}-${e.title}`}
-                className="grid grid-cols-2 items-center gap-3 py-3 sm:grid-cols-12"
-              >
-                <div className="col-span-2 flex items-center gap-2.5 sm:col-span-5">
-                  <GitBranch className="size-4 shrink-0 text-muted-foreground" />
-                  <div className="min-w-0">
-                    <div className="truncate text-sm font-medium">
-                      {e.title}
-                    </div>
-                    <div className="font-mono text-xs text-muted-foreground">
-                      {e.surface}
-                    </div>
-                  </div>
-                </div>
-                <div className="sm:col-span-2">
-                  <StatusBadge status={e.status} />
-                </div>
-                <div
-                  className={cn(
-                    "text-right font-mono text-sm tabular-nums sm:col-span-2",
-                    e.uplift.startsWith("+") && "text-primary",
-                  )}
-                >
-                  {e.uplift !== "—" && (
-                    <TrendingUp className="mr-1 inline size-3.5 align-[-2px]" />
-                  )}
-                  {e.uplift}
-                </div>
-                <div className="hidden text-right font-mono text-sm tabular-nums text-muted-foreground sm:col-span-2 sm:block">
-                  {e.confidence}
-                </div>
-                <div className="hidden text-right font-mono text-sm tabular-nums text-muted-foreground sm:col-span-1 sm:block">
-                  {e.visitors}
-                </div>
-              </div>
-            ))}
-          </div>
+          <ActiveExperiments data={active} />
         </CardContent>
       </Card>
     </div>
