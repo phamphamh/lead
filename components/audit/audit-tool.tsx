@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type AuditResponse, type AuditResult } from "@/lib/audit/types";
 import { BOOKING_URL } from "@/lib/config";
+import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
 type Phase = "idle" | "loading" | "result" | "error";
@@ -118,6 +119,10 @@ export function AuditTool() {
 
   const runFlow = useCallback(
     async (payload: { url: string; text?: string }) => {
+      track("audit_started", {
+        url: payload.url,
+        mode: payload.text ? "paste" : "url",
+      });
       setPhase("loading");
       setStatusIdx(0);
       setResult(null);
@@ -150,6 +155,11 @@ export function AuditTool() {
           pendingUrl.current = null;
           setPhase("result");
           animateScore(data.result.score);
+          track("audit_completed", {
+            url: data.url ?? payload.url,
+            score: data.result.score,
+            findings: data.result.findings.length,
+          });
           return;
         }
 
@@ -166,10 +176,15 @@ export function AuditTool() {
             "Something went wrong. Please try again.",
         );
         setPhase("error");
+        track("audit_failed", {
+          url: payload.url,
+          reason: ("error" in data && data.error) || "unknown",
+        });
       } catch {
         stopStatusTimer();
         setErrorMsg("Network error — check the URL and try again.");
         setPhase("error");
+        track("audit_failed", { url: payload.url, reason: "network" });
       }
     },
     [stopStatusTimer, animateScore],
@@ -401,7 +416,18 @@ export function AuditTool() {
                 asChild
                 className="h-[42px] rounded-lg px-[18px] text-[14.5px] font-semibold"
               >
-                <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={BOOKING_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() =>
+                    track("book_demo_clicked", {
+                      source: "audit_result",
+                      url: resultUrl,
+                      score: result.score,
+                    })
+                  }
+                >
                   Have the agent fix this
                   <ArrowRight className="size-3.5" />
                 </a>
