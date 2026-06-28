@@ -13,14 +13,23 @@ import { type AuditResult } from "@/lib/agents/types";
 import { useSession } from "@/lib/auth-client";
 
 export default function OnboardingPage() {
-  const { data: session, isPending } = useSession();
-  // Once the user acts, `step` drives the flow. Until then we derive the entry
-  // step from the session (authenticated → skip Connect, e.g. post-OAuth return).
-  const [step, setStep] = React.useState<StepKey | null>(null);
+  const { isPending } = useSession();
+  // After the GitHub OAuth round-trip we return to `/onboarding?step=repo`; honor
+  // that query param so the user lands on repo selection. Any plain visit starts
+  // at Connect — even when a session already exists — so the visitor explicitly
+  // confirms (or switches) which GitHub account is plugged in, instead of a stale
+  // cookie silently reconnecting the previous user's account.
+  const [step, setStep] = React.useState<StepKey | null>(() => {
+    if (typeof window === "undefined") return null;
+    const s = new URLSearchParams(window.location.search).get("step");
+    return s === "repo" || s === "audit" || s === "report"
+      ? (s as StepKey)
+      : null;
+  });
   const [repo, setRepo] = React.useState<Repo | null>(null);
   const [audit, setAudit] = React.useState<AuditResult | null>(null);
 
-  const current = step ?? (isPending ? null : session ? "repo" : "connect");
+  const current = step ?? (isPending ? null : "connect");
 
   if (current === null) {
     return (
@@ -35,7 +44,9 @@ export default function OnboardingPage() {
       <Stepper current={current} />
 
       <div className="flex w-full flex-1 justify-center">
-        {current === "connect" && <ConnectStep />}
+        {current === "connect" && (
+          <ConnectStep onContinue={() => setStep("repo")} />
+        )}
 
         {current === "repo" && (
           <RepoStep

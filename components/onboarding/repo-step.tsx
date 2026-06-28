@@ -12,6 +12,7 @@ import {
   Loader2,
   Lock,
   RefreshCw,
+  Rocket,
   Search,
   Sparkles,
   TriangleAlert,
@@ -24,6 +25,21 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+
+// Public sandbox repo for visitors who don't have a public landing of their own.
+// It's Vela's own (public) repo, so any signed-in user's token can read it and
+// run a real audit + A/B test against it.
+const DEMO_REPO: Repo = {
+  name: "phamphamh/Vela",
+  description:
+    "Vela's own public landing — run a real audit + A/B test without your own repo.",
+  private: false,
+  language: "TypeScript",
+  updated: "demo",
+  url: "https://github.com/phamphamh/Vela",
+  githubRepoId: "",
+  defaultBranch: "main",
+};
 
 export function RepoStep({
   onBack,
@@ -40,6 +56,7 @@ export function RepoStep({
   const [query, setQuery] = React.useState("");
   const [selected, setSelected] = React.useState<string | null>(null);
   const [saving, setSaving] = React.useState(false);
+  const [savingDemo, setSavingDemo] = React.useState(false);
 
   // No synchronous setState here — the mount effect calls this and the rules of
   // hooks forbid setting state synchronously inside an effect. State is only
@@ -123,6 +140,28 @@ export function RepoStep({
     } catch {
       setError("Couldn't connect that repository. Try again.");
       setSaving(false);
+    }
+  }
+
+  async function connectDemo() {
+    setSavingDemo(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          repoFullName: DEMO_REPO.name,
+          repoUrl: DEMO_REPO.url,
+          defaultBranch: DEMO_REPO.defaultBranch,
+          private: DEMO_REPO.private,
+        }),
+      });
+      if (!res.ok) throw new Error("save failed");
+      onSelect(DEMO_REPO);
+    } catch {
+      setError("Couldn't start the demo. Try again.");
+      setSavingDemo(false);
     }
   }
 
@@ -285,12 +324,45 @@ export function RepoStep({
         </CardContent>
       </Card>
 
+      {/* No public landing of your own? Run the whole flow on Vela's demo repo. */}
+      <div className="flex items-center gap-3">
+        <span className="h-px flex-1 bg-border" />
+        <span className="font-mono text-[11px] uppercase tracking-wide text-muted-foreground">
+          or
+        </span>
+        <span className="h-px flex-1 bg-border" />
+      </div>
+      <button
+        type="button"
+        onClick={connectDemo}
+        disabled={savingDemo || saving}
+        className="flex w-full items-center gap-3 rounded-md border border-dashed border-border bg-muted/30 px-4 py-3 text-left transition-colors hover:bg-accent/50 disabled:opacity-60"
+      >
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-primary">
+          {savingDemo ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <Rocket className="size-4" />
+          )}
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="text-sm font-medium">
+            No public landing yet? Try Vela on our demo repo
+          </div>
+          <div className="truncate text-xs text-muted-foreground">
+            Runs a real audit + A/B test on{" "}
+            <span className="font-mono">{DEMO_REPO.name}</span>
+          </div>
+        </div>
+        <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
+      </button>
+
       <div className="flex items-center justify-between">
         <Button variant="ghost" size="sm" onClick={onBack} disabled={saving}>
           <ArrowLeft className="size-4" />
           Back
         </Button>
-        <Button size="sm" disabled={!chosen || saving} onClick={audit}>
+        <Button size="sm" disabled={!chosen || saving || savingDemo} onClick={audit}>
           {saving ? (
             <>
               <Loader2 className="size-4 animate-spin" />

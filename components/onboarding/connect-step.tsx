@@ -1,9 +1,16 @@
 "use client";
 
 import * as React from "react";
-import { Eye, GitPullRequest, Loader2, Lock, ShieldCheck } from "lucide-react";
+import {
+  ArrowRight,
+  Eye,
+  GitPullRequest,
+  Loader2,
+  Lock,
+  ShieldCheck,
+} from "lucide-react";
 
-import { authClient } from "@/lib/auth-client";
+import { authClient, signOut, useSession } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -33,8 +40,11 @@ const guarantees = [
   },
 ];
 
-export function ConnectStep() {
+export function ConnectStep({ onContinue }: { onContinue: () => void }) {
+  const { data: session } = useSession();
   const [connecting, setConnecting] = React.useState(false);
+  const [switching, setSwitching] = React.useState(false);
+  const user = session?.user;
 
   async function connect() {
     setConnecting(true);
@@ -46,6 +56,22 @@ export function ConnectStep() {
       });
     } catch {
       setConnecting(false);
+    }
+  }
+
+  async function switchAccount() {
+    setSwitching(true);
+    try {
+      // Clear the current Better Auth session, then restart GitHub OAuth so a
+      // different account can be plugged in — otherwise a stale cookie silently
+      // reconnects the previous user's GitHub.
+      await signOut();
+      await authClient.signIn.social({
+        provider: "github",
+        callbackURL: "/onboarding?step=repo",
+      });
+    } catch {
+      setSwitching(false);
     }
   }
 
@@ -63,24 +89,62 @@ export function ConnectStep() {
 
       <Card>
         <CardContent className="space-y-5">
-          <Button
-            size="lg"
-            className="w-full"
-            onClick={connect}
-            disabled={connecting}
-          >
-            {connecting ? (
-              <>
-                <Loader2 className="size-4 animate-spin" />
-                Connecting…
-              </>
-            ) : (
-              <>
-                <GithubMark className="size-4" />
-                Continue with GitHub
-              </>
-            )}
-          </Button>
+          {user ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 rounded-md border border-border bg-muted/40 px-3 py-2.5 text-left">
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-medium uppercase">
+                  {(user.name ?? user.email ?? "?").slice(0, 1)}
+                </span>
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-medium">
+                    {user.name ?? "Signed in"}
+                  </div>
+                  <div className="truncate font-mono text-xs text-muted-foreground">
+                    {user.email}
+                  </div>
+                </div>
+              </div>
+              <Button size="lg" className="w-full" onClick={onContinue}>
+                Continue as {user.name ?? "this account"}
+                <ArrowRight className="size-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full"
+                onClick={switchAccount}
+                disabled={switching}
+              >
+                {switching ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" />
+                    Switching account…
+                  </>
+                ) : (
+                  "Use a different GitHub account"
+                )}
+              </Button>
+            </div>
+          ) : (
+            <Button
+              size="lg"
+              className="w-full"
+              onClick={connect}
+              disabled={connecting}
+            >
+              {connecting ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" />
+                  Connecting…
+                </>
+              ) : (
+                <>
+                  <GithubMark className="size-4" />
+                  Continue with GitHub
+                </>
+              )}
+            </Button>
+          )}
 
           <div className="space-y-3.5 text-left">
             {guarantees.map((g) => {
