@@ -31,6 +31,7 @@ export function LaunchExperiment({
   hint,
   className,
   refresh = true,
+  demo = false,
 }: {
   hint?: LaunchHint;
   className?: string;
@@ -39,9 +40,11 @@ export function LaunchExperiment({
   // the onboarding flow, where the page is driven by local step state — a refresh
   // there resets the wizard back to the start.
   refresh?: boolean;
+  // Demo mode launches via /api/demo/launch (no GitHub login; acts as owner).
+  demo?: boolean;
 }) {
   const { state, step, proposal, done, error, run, activateNow } =
-    useLaunch({ refresh });
+    useLaunch({ refresh, demo });
 
   return (
     <div

@@ -51,9 +51,12 @@ function scoreTone(score: number) {
 export function ReportStep({
   repoName,
   audit,
+  demo = false,
 }: {
   repoName: string;
   audit: AuditResult;
+  // Demo mode launches via the no-login endpoint (acts as the demo repo owner).
+  demo?: boolean;
 }) {
   const surfaces = audit.surfaces;
   const opportunityCount = surfaces.reduce((n, s) => n + s.advice.length, 0);
@@ -224,6 +227,7 @@ export function ReportStep({
         <div className="space-y-3">
           <LaunchExperiment
             refresh={false}
+            demo={demo}
             hint={
               topOpportunity
                 ? {

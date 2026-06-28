@@ -13,7 +13,7 @@ import { type AuditResult } from "@/lib/agents/types";
 import { useSession } from "@/lib/auth-client";
 
 export default function OnboardingPage() {
-  const { data: session, isPending } = useSession();
+  const { isPending } = useSession();
   // After the GitHub OAuth round-trip we return to `/onboarding?step=repo`; honor
   // that query param so the user lands on repo selection. Any plain visit starts
   // at Connect — even when a session already exists — so the visitor explicitly
@@ -28,57 +28,19 @@ export default function OnboardingPage() {
   });
   const [repo, setRepo] = React.useState<Repo | null>(null);
   const [audit, setAudit] = React.useState<AuditResult | null>(null);
+  // "Try it on our landing": run the audit/launch on Vela's own repo with NO
+  // GitHub login — the server acts as the repo owner (see /api/demo/*).
+  const [demo, setDemo] = React.useState(false);
 
-  // "Try it on our landing" path: connect Vela's own public repo and jump
-  // straight to the audit, skipping repo selection. Set when the user picks the
-  // demo on Connect — either inline (already signed in) or via the OAuth return
-  // to `/onboarding?demo=1`.
-  const [demoMode, setDemoMode] = React.useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return new URLSearchParams(window.location.search).get("demo") === "1";
-  });
-  const demoTriggered = React.useRef(false);
-
-  const connectDemo = React.useCallback(async () => {
-    if (demoTriggered.current) return;
-    demoTriggered.current = true;
-    setDemoMode(true);
-    try {
-      const res = await fetch("/api/projects", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          repoFullName: DEMO_REPO.name,
-          repoUrl: DEMO_REPO.url,
-          defaultBranch: DEMO_REPO.defaultBranch,
-          private: DEMO_REPO.private,
-        }),
-      });
-      if (!res.ok) throw new Error("demo connect failed");
-      setRepo(DEMO_REPO);
-      setStep("audit");
-    } catch {
-      // Fall back to the normal Connect screen so the user can retry.
-      demoTriggered.current = false;
-      setDemoMode(false);
-      setStep("connect");
-    }
+  const startDemo = React.useCallback(() => {
+    setDemo(true);
+    setRepo(DEMO_REPO);
+    setStep("audit");
   }, []);
 
-  // Auto-run the demo connect when we return from OAuth with `?demo=1`.
-  React.useEffect(() => {
-    if (isPending || !session || !demoMode || demoTriggered.current) return;
-    void connectDemo();
-  }, [isPending, session, demoMode, connectDemo]);
-
   const current = step ?? (isPending ? null : "connect");
-  // While the demo project is being connected, show a loader instead of flashing
-  // the Connect screen.
-  const showLoader =
-    current === null ||
-    (demoMode && step !== "audit" && step !== "report");
 
-  if (showLoader) {
+  if (current === null) {
     return (
       <div className="flex flex-1 items-center justify-center">
         <Loader2 className="size-5 animate-spin text-muted-foreground" />
@@ -94,13 +56,14 @@ export default function OnboardingPage() {
         {current === "connect" && (
           <ConnectStep
             onContinue={() => setStep("repo")}
-            onDemo={connectDemo}
+            onDemo={startDemo}
           />
         )}
 
         {current === "repo" && (
           <RepoStep
             onBack={() => setStep("connect")}
+            onDemo={startDemo}
             onSelect={(r) => {
               setRepo(r);
               setStep("audit");
@@ -111,6 +74,7 @@ export default function OnboardingPage() {
         {current === "audit" && repo && (
           <AuditStep
             repoFullName={repo.name}
+            demo={demo}
             onComplete={(result) => {
               setAudit(result);
               setStep("report");
@@ -119,7 +83,7 @@ export default function OnboardingPage() {
         )}
 
         {current === "report" && repo && audit && (
-          <ReportStep repoName={repo.name} audit={audit} />
+          <ReportStep repoName={repo.name} audit={audit} demo={demo} />
         )}
       </div>
     </div>

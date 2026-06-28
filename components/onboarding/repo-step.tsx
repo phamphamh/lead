@@ -29,9 +29,12 @@ import { cn } from "@/lib/utils";
 export function RepoStep({
   onBack,
   onSelect,
+  onDemo,
 }: {
   onBack: () => void;
   onSelect: (repo: Repo) => void;
+  // Start the no-login demo (audits Vela's own repo as the owner).
+  onDemo: () => void;
 }) {
   const [repos, setRepos] = React.useState<Repo[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -128,26 +131,10 @@ export function RepoStep({
     }
   }
 
-  async function connectDemo() {
+  function connectDemo() {
+    // No-login demo: runs as the repo owner server-side (see /api/demo/*).
     setSavingDemo(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/projects", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          repoFullName: DEMO_REPO.name,
-          repoUrl: DEMO_REPO.url,
-          defaultBranch: DEMO_REPO.defaultBranch,
-          private: DEMO_REPO.private,
-        }),
-      });
-      if (!res.ok) throw new Error("save failed");
-      onSelect(DEMO_REPO);
-    } catch {
-      setError("Couldn't start the demo. Try again.");
-      setSavingDemo(false);
-    }
+    onDemo();
   }
 
   return (

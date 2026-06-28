@@ -33,9 +33,12 @@ type LogEntry = { label: string; detail?: string };
 export function AuditStep({
   repoFullName,
   onComplete,
+  demo = false,
 }: {
   repoFullName: string;
   onComplete: (result: AuditResult) => void;
+  // Demo mode hits the no-login endpoint (acts as the demo repo owner).
+  demo?: boolean;
 }) {
   const [log, setLog] = React.useState<LogEntry[]>([]);
   const [progress, setProgress] = React.useState(0);
@@ -61,10 +64,10 @@ export function AuditStep({
       setError(null);
 
       try {
-        const res = await fetch("/api/audit/repo", {
+        const res = await fetch(demo ? "/api/demo/audit" : "/api/audit/repo", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ repoFullName }),
+          body: demo ? undefined : JSON.stringify({ repoFullName }),
           signal: controller.signal,
         });
         if (!res.ok || !res.body) {
@@ -127,7 +130,7 @@ export function AuditStep({
       cancelled = true;
       controller.abort();
     };
-  }, [repoFullName, attempt]);
+  }, [repoFullName, attempt, demo]);
 
   // The running line is the last log entry; everything before it is "done".
   const current = log.length - 1;

@@ -45,8 +45,11 @@ export type LaunchState = "idle" | "running" | "queued" | "live" | "error";
  * it opens (POST /api/experiments/launch), then polls the experiment status so
  * the UI flips to "live" the moment the PR is merged + deployed.
  */
-export function useLaunch(options?: { refresh?: boolean }) {
+export function useLaunch(options?: { refresh?: boolean; demo?: boolean }) {
   const refreshEnabled = options?.refresh ?? true;
+  const launchEndpoint = options?.demo
+    ? "/api/demo/launch"
+    : "/api/experiments/launch";
   const router = useRouter();
   // router.refresh() re-fetches server components. On the dashboard that's how
   // the experiment lists update; in the onboarding wizard (driven by local step
@@ -112,7 +115,7 @@ export function useLaunch(options?: { refresh?: boolean }) {
       setDone(null);
       setError(null);
       try {
-        const res = await fetch("/api/experiments/launch", {
+        const res = await fetch(launchEndpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(hint ?? {}),
@@ -153,7 +156,7 @@ export function useLaunch(options?: { refresh?: boolean }) {
         setState("error");
       }
     },
-    [refresh, startPolling],
+    [refresh, startPolling, launchEndpoint],
   );
 
   return { state, step, proposal, done, error, run, activateNow };

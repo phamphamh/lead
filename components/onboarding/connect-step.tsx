@@ -54,23 +54,10 @@ export function ConnectStep({
   const [demoLoading, setDemoLoading] = React.useState(false);
   const user = session?.user;
 
-  async function tryDemo() {
-    // Already signed in → connect the demo repo inline. Otherwise sign in first
-    // and come back to `?demo=1`, which auto-connects it.
-    if (user) {
-      setDemoLoading(true);
-      onDemo();
-      return;
-    }
+  function tryDemo() {
+    // No GitHub login required: the demo runs server-side as the repo owner.
     setDemoLoading(true);
-    try {
-      await authClient.signIn.social({
-        provider: "github",
-        callbackURL: "/onboarding?demo=1",
-      });
-    } catch {
-      setDemoLoading(false);
-    }
+    onDemo();
   }
 
   async function connect() {
@@ -196,10 +183,10 @@ export function ConnectStep({
             </span>
             <div className="min-w-0 flex-1">
               <div className="text-sm font-medium">
-                No repo to connect? Try it on our landing
+                No GitHub? Try it on our landing
               </div>
               <div className="text-xs text-muted-foreground">
-                Run a real audit + A/B test on Vela&apos;s own landing
+                Run a real audit + A/B test on Vela&apos;s own landing — no login
               </div>
             </div>
             <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
