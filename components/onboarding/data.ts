@@ -21,6 +21,21 @@ export type Repo = {
   defaultBranch: string;
 };
 
+// Public sandbox repo for visitors who want to see Vela end-to-end without
+// connecting their own code. It's Vela's own (public) repo, so any signed-in
+// user's token can read it and run a real audit + A/B test against it.
+export const DEMO_REPO: Repo = {
+  name: "phamphamh/Vela",
+  description:
+    "Vela's own public landing — run a real audit + A/B test without your own repo.",
+  private: false,
+  language: "TypeScript",
+  updated: "demo",
+  url: "https://github.com/phamphamh/Vela",
+  githubRepoId: "",
+  defaultBranch: "main",
+};
+
 /* --- audit progress (mock) -------------------------------------------- */
 
 export type AuditTask = {

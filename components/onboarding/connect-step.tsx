@@ -7,6 +7,7 @@ import {
   GitPullRequest,
   Loader2,
   Lock,
+  Rocket,
   ShieldCheck,
 } from "lucide-react";
 
@@ -40,11 +41,37 @@ const guarantees = [
   },
 ];
 
-export function ConnectStep({ onContinue }: { onContinue: () => void }) {
+export function ConnectStep({
+  onContinue,
+  onDemo,
+}: {
+  onContinue: () => void;
+  onDemo: () => void;
+}) {
   const { data: session } = useSession();
   const [connecting, setConnecting] = React.useState(false);
   const [switching, setSwitching] = React.useState(false);
+  const [demoLoading, setDemoLoading] = React.useState(false);
   const user = session?.user;
+
+  async function tryDemo() {
+    // Already signed in → connect the demo repo inline. Otherwise sign in first
+    // and come back to `?demo=1`, which auto-connects it.
+    if (user) {
+      setDemoLoading(true);
+      onDemo();
+      return;
+    }
+    setDemoLoading(true);
+    try {
+      await authClient.signIn.social({
+        provider: "github",
+        callbackURL: "/onboarding?demo=1",
+      });
+    } catch {
+      setDemoLoading(false);
+    }
+  }
 
   async function connect() {
     setConnecting(true);
@@ -145,6 +172,38 @@ export function ConnectStep({ onContinue }: { onContinue: () => void }) {
               )}
             </Button>
           )}
+
+          {/* No public landing of your own? See it on Vela's own landing. */}
+          <div className="flex items-center gap-3">
+            <span className="h-px flex-1 bg-border" />
+            <span className="font-mono text-[11px] uppercase tracking-wide text-muted-foreground">
+              or
+            </span>
+            <span className="h-px flex-1 bg-border" />
+          </div>
+          <button
+            type="button"
+            onClick={tryDemo}
+            disabled={demoLoading || connecting || switching}
+            className="flex w-full items-center gap-3 rounded-md border border-dashed border-border bg-muted/30 px-4 py-3 text-left transition-colors hover:bg-accent/50 disabled:opacity-60"
+          >
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-primary">
+              {demoLoading ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Rocket className="size-4" />
+              )}
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="text-sm font-medium">
+                No repo to connect? Try it on our landing
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Run a real audit + A/B test on Vela&apos;s own landing
+              </div>
+            </div>
+            <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
+          </button>
 
           <div className="space-y-3.5 text-left">
             {guarantees.map((g) => {

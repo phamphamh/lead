@@ -18,28 +18,13 @@ import {
   TriangleAlert,
 } from "lucide-react";
 
-import { type Repo } from "@/components/onboarding/data";
+import { DEMO_REPO, type Repo } from "@/components/onboarding/data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-
-// Public sandbox repo for visitors who don't have a public landing of their own.
-// It's Vela's own (public) repo, so any signed-in user's token can read it and
-// run a real audit + A/B test against it.
-const DEMO_REPO: Repo = {
-  name: "phamphamh/Vela",
-  description:
-    "Vela's own public landing — run a real audit + A/B test without your own repo.",
-  private: false,
-  language: "TypeScript",
-  updated: "demo",
-  url: "https://github.com/phamphamh/Vela",
-  githubRepoId: "",
-  defaultBranch: "main",
-};
 
 export function RepoStep({
   onBack,
