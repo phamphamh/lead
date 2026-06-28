@@ -45,6 +45,44 @@ type DiscoveredSurface = {
   rationale: string;
 };
 
+const SURFACE_KEYS: SurfaceKey[] = ["landing", "onboarding", "paywall"];
+
+/**
+ * Merge the surfaces reported across one or more `submit_findings` tool calls.
+ *
+ * The discovery model sometimes splits its conclusions across **multiple**
+ * `submit_findings` calls in a single turn (one per surface, or a full call
+ * followed by empty ones). The old code kept only the last call, so a trailing
+ * empty call clobbered real findings and the audit reported 0 surfaces. Here we
+ * fold every call together, deduped by key, keeping the strongest signal per
+ * surface: present-with-files beats present-without-files beats absent.
+ */
+export function mergeSurfaceFindings(
+  calls: { surfaces?: DiscoveredSurface[] }[],
+): DiscoveredSurface[] {
+  const rank = (s: DiscoveredSurface) =>
+    s.present && s.files.length > 0 ? 2 : s.present ? 1 : 0;
+
+  const byKey = new Map<SurfaceKey, DiscoveredSurface>();
+  for (const call of calls) {
+    const surfaces = Array.isArray(call?.surfaces) ? call.surfaces : [];
+    for (const raw of surfaces) {
+      if (!raw || !SURFACE_KEYS.includes(raw.key)) continue;
+      const normalized: DiscoveredSurface = {
+        key: raw.key,
+        present: Boolean(raw.present),
+        files: Array.isArray(raw.files) ? raw.files.filter((f) => typeof f === "string") : [],
+        rationale: typeof raw.rationale === "string" ? raw.rationale : "",
+      };
+      const existing = byKey.get(normalized.key);
+      if (!existing || rank(normalized) > rank(existing)) {
+        byKey.set(normalized.key, normalized);
+      }
+    }
+  }
+  return [...byKey.values()];
+}
+
 const READ_FILE_TOOL: Anthropic.Tool = {
   name: "read_file",
   description:
@@ -193,14 +231,16 @@ async function runDiscovery(
     }
 
     const toolResults: Anthropic.ToolResultBlockParam[] = [];
-    let submitted: DiscoveredSurface[] | null = null;
+    // The model may emit several submit_findings calls in one turn — collect
+    // them all and merge, rather than letting the last one win (see
+    // mergeSurfaceFindings).
+    const submitCalls: { surfaces?: DiscoveredSurface[] }[] = [];
 
     for (const block of resp.content) {
       if (block.type !== "tool_use") continue;
 
       if (block.name === "submit_findings") {
-        const input = block.input as { surfaces?: DiscoveredSurface[] };
-        submitted = Array.isArray(input?.surfaces) ? input.surfaces : [];
+        submitCalls.push(block.input as { surfaces?: DiscoveredSurface[] });
         toolResults.push({
           type: "tool_result",
           tool_use_id: block.id,
@@ -234,9 +274,10 @@ async function runDiscovery(
       }
     }
 
-    if (submitted) {
+    if (submitCalls.length > 0) {
+      const submitted = mergeSurfaceFindings(submitCalls);
       console.log(
-        "[audit] findings:",
+        `[audit] findings (from ${submitCalls.length} submit call${submitCalls.length > 1 ? "s" : ""}):`,
         JSON.stringify(
           submitted.map((s) => ({
             key: s.key,
